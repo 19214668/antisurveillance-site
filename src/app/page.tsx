@@ -292,6 +292,8 @@ export default function Page() {
           <div className="flex items-center gap-4 text-sm">
             <a href="#download" className="text-gray-600 hover:text-gray-900">Download</a>
             <a href="#features" className="text-gray-600 hover:text-gray-900">Features</a>
+            <a href="/privacy" className="text-gray-600 hover:text-gray-900">Privacy</a>
+<a href="/terms" className="text-gray-600 hover:text-gray-900">Terms</a>
           </div>
         </Section>
       </footer>
