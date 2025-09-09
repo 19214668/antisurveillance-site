@@ -6,6 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Check, Shield, EyeOff, Wifi, Bluetooth, Camera, Lock, Download, Mail } from "lucide-react";
 
+const FORM_ENDPOINT = "https://formspree.io/f/xwpnyvjr";
+
 const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
   <a href={href} className="text-sm md:text-base text-gray-600 hover:text-gray-900 transition-colors">
     {children}
@@ -25,11 +27,32 @@ const Section = ({
 export default function Page() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // TODO: connect to Formspree/Mailchimp later
-    setSubmitted(true);
+    setError(null);
+
+    const form = e.currentTarget;
+    const data = new FormData(form);
+
+    try {
+      const res = await fetch(FORM_ENDPOINT, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: data,
+      });
+
+      if (res.ok) {
+        setSubmitted(true);
+        form.reset();
+      } else {
+        const payload = await res.json().catch(() => ({}));
+        setError(payload?.error || "Something went wrong. Please try again.");
+      }
+    } catch {
+      setError("Network error. Please try again.");
+    }
   };
 
   return (
@@ -45,7 +68,6 @@ export default function Page() {
             <NavLink href="#home">Home</NavLink>
             <NavLink href="#features">Features</NavLink>
             <NavLink href="#wearables">Wearables</NavLink>
-            <NavLink href="#screens">Screens</NavLink>
             <NavLink href="#download">Download</NavLink>
             <NavLink href="#contact">Contact</NavLink>
           </nav>
@@ -184,23 +206,47 @@ export default function Page() {
               Currently targeting Android first. iOS evaluation in progress. Join the list and we’ll ping you when
               Beta is live.
             </p>
-            <form onSubmit={handleSubmit} className="mt-6 flex flex-col sm:flex-row gap-3 max-w-lg">
+
+            <form
+              onSubmit={handleSubmit}
+              action={FORM_ENDPOINT}
+              method="POST"
+              className="mt-6 flex flex-col gap-3 max-w-lg"
+            >
+              {/* Honeypot field (hidden from real users) */}
+              <input type="text" name="_gotcha" style={{ display: "none" }} />
+
+              {/* Hidden subject line (optional, shows up in your Formspree inbox) */}
+              <input type="hidden" name="_subject" value="New waitlist signup" />
+
               <Input
                 type="email"
+                name="email"
                 required
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-11"
               />
-              <Button type="submit" className="h-11"><Mail className="w-4 h-4 mr-2" /> Join waitlist</Button>
+
+              <Button type="submit" className="h-11">
+                <Mail className="w-4 h-4 mr-2" /> Join waitlist
+              </Button>
+
+              {submitted && (
+                <p className="text-sm text-green-600 mt-2">
+                  Thanks! You're on the waitlist.
+                </p>
+              )}
+
+              {error && (
+                <p className="text-sm text-red-600 mt-2">
+                  {error}
+                </p>
+              )}
             </form>
-            {submitted && (
-              <p className="text-sm text-green-600 mt-2">
-                Thanks! Your email is noted locally. Wire this form to your email provider before launch.
-              </p>
-            )}
           </div>
+
           <Card className="rounded-2xl">
             <CardContent className="p-8">
               <div className="flex items-start gap-4">
@@ -217,13 +263,35 @@ export default function Page() {
         </div>
       </Section>
 
+      {/* Contact */}
+      <Section id="contact" className="py-16 md:py-24">
+        <div className="max-w-2xl">
+          <h2 className="text-3xl md:text-5xl font-bold">Contact</h2>
+          <p className="mt-4 text-gray-600">Questions, partnerships, or press? Drop us a line.</p>
+          <div className="mt-6 grid sm:grid-cols-2 gap-4">
+            <Card className="rounded-2xl">
+              <CardContent className="p-5 text-sm text-gray-700">
+                <p className="font-medium">General</p>
+                <p className="text-gray-600">support@antisurveillance.com</p>
+              </CardContent>
+            </Card>
+            <Card className="rounded-2xl">
+              <CardContent className="p-5 text-sm text-gray-700">
+                <p className="font-medium">Business</p>
+                <p className="text-gray-600">hello@antisurveillance.com</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </Section>
+
       {/* Footer */}
       <footer className="border-t">
         <Section className="py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-500">© {new Date().getFullYear()} Anti-Surveillance. All rights reserved.</p>
           <div className="flex items-center gap-4 text-sm">
-            <a href="#policy" className="text-gray-600 hover:text-gray-900">Privacy</a>
-            <a href="#policy" className="text-gray-600 hover:text-gray-900">Terms</a>
+            <a href="#download" className="text-gray-600 hover:text-gray-900">Download</a>
+            <a href="#features" className="text-gray-600 hover:text-gray-900">Features</a>
           </div>
         </Section>
       </footer>
