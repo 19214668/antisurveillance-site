@@ -69,6 +69,7 @@ export default function Page() {
             <NavLink href="#features">Features</NavLink>
             <NavLink href="#wearables">Wearables</NavLink>
             <NavLink href="#download">Download</NavLink>
+            <NavLink href="/about">About</NavLink>
             <NavLink href="#contact">Contact</NavLink>
           </nav>
         </Section>
