@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react"; // ← add this
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,12 +26,7 @@ export const metadata: Metadata = {
     url: "https://antisurveillancesite.vercel.app",
     siteName: "Anti-Surveillance",
     images: [
-      {
-        url: "/og-image.png", // add your own preview image later
-        width: 1200,
-        height: 630,
-        alt: "Anti-Surveillance App Preview",
-      },
+      { url: "/og-image.png", width: 1200, height: 630, alt: "Anti-Surveillance App Preview" },
     ],
     locale: "en_GB",
     type: "website",
@@ -41,22 +37,19 @@ export const metadata: Metadata = {
     description:
       "Take back your privacy. Detect hidden cameras, secure your data, and protect your space.",
     images: ["/og-image.png"],
-    creator: "@yourhandle", // optional, replace if you have Twitter
+    creator: "@yourhandle",
   },
   metadataBase: new URL("https://antisurveillancesite.vercel.app"),
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
+        <Analytics /> {/* ← add this */}
       </body>
     </html>
   );
